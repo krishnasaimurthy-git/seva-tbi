@@ -1,13 +1,1125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>seva-tbi</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SEVA 2026 — School Event & Visit Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1A1A2E;--navy-light:#252540;--navy-mid:#2E2E50;
+  --coral:#CC785C;--coral-hover:#B8664A;--coral-light:#FAECE7;--coral-mid:#F0997B;
+  --bg:#F7F5F1;--card:#FFFFFF;--border:#E6E2DA;--border-strong:#CDC9C0;
+  --text:#1A1A2E;--muted:#6B6875;--faint:#A09DB0;
+  --ok:#3B6D11;--ok-bg:#EAF3DE;--ok-border:#C0DD97;
+  --warn:#8A6200;--warn-bg:#FFF8E7;--warn-border:#FAC775;
+  --danger:#A32D2D;--danger-bg:#FCEBEB;--danger-border:#F7C1C1;
+  --info:#185FA5;--info-bg:#E6F1FB;--info-border:#B5D4F4;
+  --radius:10px;--radius-lg:14px;--shadow:0 2px 8px rgba(26,26,46,0.06);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ── SIDEBAR ── */
+.brand{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand-icon{width:32px;height:32px;background:var(--coral);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.brand-icon svg{width:18px;height:18px;fill:#fff}
+.brand-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px}
+.brand-tagline{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;padding-left:42px}
+
+.nav-section{padding:20px 12px 0}
+.nav-label{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2.5px;text-transform:uppercase;padding:0 8px 10px;font-family:'Syne',sans-serif}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 10px;cursor:pointer;color:rgba(255,255,255,0.5);font-size:13px;font-family:'Syne',sans-serif;font-weight:500;transition:all 0.15s;border-radius:8px;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.nav-item.active{background:rgba(204,120,92,0.18);color:var(--coral)}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;font-family:'DM Sans',sans-serif}
+.nav-badge.warn{background:#F5C842;color:#5A3E00}
+
+.sidebar-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,0.07);margin-top:auto}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#fff}
+.user-role{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.page-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--navy)}
+.page-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--navy);transition:all 0.15s;letter-spacing:0.3px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--bg);border-color:var(--border-strong);transform:translateY(-1px)}
+.btn:active{transform:translateY(0);opacity:0.85}
+.btn-primary{background:var(--coral);color:#fff;border-color:var(--coral)}
+.btn-primary:hover{background:var(--coral-hover);border-color:var(--coral-hover)}
+.btn-navy{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-navy:hover{background:var(--navy-light)}
+.btn-danger{background:#FCEBEB;color:var(--danger);border-color:var(--danger-border)}
+.btn-danger:hover{background:#F7C1C1}
+.btn-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border)}
+.btn-warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-border)}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:6px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:5px}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── CONTENT ── */
+.content{flex:1;padding:24px 28px;overflow-y:auto}
+.view{display:none}
+.view.active{display:block}
+
+/* ── METRICS GRID ── */
+.metrics-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;position:relative;overflow:hidden;cursor:default}
+.metric-top{width:100%;height:3px;position:absolute;top:0;left:0;right:0;background:var(--coral)}
+.metric-top.ok{background:#639922}
+.metric-top.warn{background:#F5C842}
+.metric-top.danger{background:#E24B4A}
+.metric-top.info{background:#378ADD}
+.metric-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;font-family:'Syne',sans-serif;font-weight:600}
+.metric-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--navy);line-height:1}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px}
+.metric-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px}
+.metric-delta.up{background:var(--ok-bg);color:var(--ok)}
+.metric-delta.down{background:var(--danger-bg);color:var(--danger)}
+
+/* ── TWO-COL SECTION ── */
+.two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px}
+.full-col{margin-bottom:20px}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--navy)}
+.card-subtitle{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── WARNINGS ── */
+.warning-list{display:flex;flex-direction:column;gap:8px}
+.w-item{display:flex;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid;align-items:flex-start}
+.w-item.danger{background:var(--danger-bg);border-color:var(--danger-border)}
+.w-item.warn{background:var(--warn-bg);border-color:var(--warn-border)}
+.w-item.ok{background:var(--ok-bg);border-color:var(--ok-border)}
+.w-item.info{background:var(--info-bg);border-color:var(--info-border)}
+.w-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.danger .w-dot{background:#E24B4A}
+.warn .w-dot{background:#F5C842}
+.ok .w-dot{background:#639922}
+.info .w-dot{background:#378ADD}
+.w-body{flex:1;min-width:0}
+.w-school{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:1px}
+.w-msg{font-size:12px;color:var(--muted);line-height:1.4}
+.w-actions{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin:-4px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{font-family:'Syne',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:600;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:10px 12px;border-bottom:1px solid #F2EFE9;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#FAFAF7}
+
+/* ── PILLS & BADGES ── */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:'Syne',sans-serif;letter-spacing:0.5px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)}
+.pill.warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.pill.danger{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+.pill.info{background:var(--info-bg);color:var(--info);border:1px solid var(--info-border)}
+.pill.gray{background:#F1EFE8;color:#5F5E5A;border:1px solid #D3D1C7}
+.pill-dot{width:6px;height:6px;border-radius:50%}
+.ok .pill-dot{background:var(--ok)}
+.warn .pill-dot{background:var(--warn)}
+.danger .pill-dot{background:var(--danger)}
+.info .pill-dot{background:var(--info)}
+.gray .pill-dot{background:#888780}
+
+/* ── PROGRESS ── */
+.progress-bar{height:6px;background:#EDE9E1;border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:3px;background:var(--coral);transition:width 0.6s ease}
+.progress-fill.ok{background:#639922}
+.progress-fill.warn{background:#F5C842}
+.progress-fill.danger{background:#E24B4A}
+
+/* ── NOTIFICATION TOAST ── */
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--navy);color:#fff;padding:14px 18px;border-radius:10px;font-size:13px;min-width:260px;max-width:340px;display:flex;gap:12px;align-items:flex-start;pointer-events:all;box-shadow:0 8px 24px rgba(26,26,46,0.3);animation:slideIn 0.3s ease;border-left:3px solid var(--coral)}
+.toast.warn-toast{border-left-color:#F5C842}
+.toast.ok-toast{border-left-color:#639922}
+.toast-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.toast-body{flex:1}
+.toast-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:2px}
+.toast-msg{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.4}
+.toast-close{background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:18px;line-height:1;flex-shrink:0}
+.toast-close:hover{color:#fff}
+@keyframes slideIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:var(--radius-lg);width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(26,26,46,0.25)}
+.modal-hd{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--navy)}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;line-height:1;padding:0}
+.modal-close:hover{color:var(--navy)}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+.form-row{margin-bottom:16px}
+.form-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;outline:none;transition:border-color 0.15s}
+.form-input:focus{border-color:var(--coral);box-shadow:0 0 0 3px rgba(204,120,92,0.1)}
+.form-select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:#fff;outline:none;cursor:pointer}
+.form-select:focus{border-color:var(--coral)}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── SEARCH & FILTER ── */
+.filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search-box{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 12px;flex:1;min-width:200px}
+.search-box input{border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:transparent;width:100%}
+.search-box svg{width:14px;height:14px;color:var(--muted);flex-shrink:0}
+
+/* ── ANALYTICS BARS ── */
+.analytics-row{display:flex;flex-direction:column;gap:10px}
+.analytic-item{display:flex;align-items:center;gap:12px}
+.analytic-label{font-size:12px;color:var(--muted);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analytic-bar-wrap{flex:1;height:8px;background:#EDE9E1;border-radius:4px;overflow:hidden}
+.analytic-bar{height:100%;border-radius:4px;background:var(--coral);transition:width 0.8s ease}
+.analytic-val{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--navy);width:36px;text-align:right;flex-shrink:0}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;background:#EDE9E1;border-radius:10px;padding:3px;margin-bottom:20px;width:fit-content}
+.tab{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;border-radius:8px;cursor:pointer;color:var(--muted);border:none;background:none;transition:all 0.15s}
+.tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px rgba(26,26,46,0.1)}
+.tab:hover:not(.active){color:var(--navy)}
+
+/* ── PREDICTION BAND ── */
+.predict-band{background:linear-gradient(135deg,var(--coral-light),#fff);border:1px solid var(--coral-mid);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px}
+.predict-icon{width:40px;height:40px;background:var(--coral);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.predict-icon svg{width:20px;height:20px;fill:#fff}
+.predict-text h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.predict-text p{font-size:12px;color:var(--muted)}
+.predict-actions{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty svg{width:40px;height:40px;opacity:0.3;margin-bottom:12px}
+
+/* ── CERT CARDS ── */
+.cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cert-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;position:relative;overflow:hidden}
+.cert-card::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;background:var(--coral-light);border-radius:0 0 0 60px;opacity:0.5}
+.cert-provider{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--coral);font-family:'Syne',sans-serif;margin-bottom:8px}
+.cert-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;line-height:1.3}
+.cert-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.cert-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.cert-actions{display:flex;gap:8px;margin-top:12px}
+
+/* ── RESPONSIVE HELPERS ── */
+.divider{height:1px;background:var(--border);margin:16px 0}
+.row{display:flex;align-items:center;gap:12px}
+.ml-auto{margin-left:auto}
+.text-muted{color:var(--muted);font-size:12px}
+.text-danger{color:var(--danger)}
+.text-ok{color:var(--ok)}
+.text-warn{color:var(--warn)}
+.badge{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.5px}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-logo">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <span class="brand-name">SEVA</span>
+    </div>
+    <div class="brand-tagline">TBI · Telangana 2026</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Operations</div>
+    <button class="nav-item active" onclick="showView('dashboard',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showView('warnings',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+      Warning Engine
+      <span class="nav-badge warn" id="warn-count">5</span>
+    </button>
+    <button class="nav-item" onclick="showView('schools',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+      Schools
+    </button>
+    <button class="nav-item" onclick="showView('events',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      Events
+    </button>
+
+    <div class="nav-label" style="margin-top:16px">Compliance</div>
+    <button class="nav-item" onclick="showView('ecf',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-3 7l-2-2 1.4-1.4.6.6 2.6-2.6 1.4 1.4L10 16z"/></svg>
+      ECF Status
+      <span class="nav-badge" id="ecf-badge">12</span>
+    </button>
+    <button class="nav-item" onclick="showView('gcf',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+      GCF / WSF Status
+    </button>
+
+    <div class="nav-label" style="margin-top:16px">Growth</div>
+    <button class="nav-item" onclick="showView('analytics',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5 13.5 13 9.5 9 2 16.5l1.5 2z"/></svg>
+      Predictive Analytics
+    </button>
+    <button class="nav-item" onclick="showView('certs',this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/></svg>
+      Certifications
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">PS</div>
+      <div>
+        <div class="user-name">Pammi Sai Krishna</div>
+        <div class="user-role">Project Lead</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="page-sub" id="page-sub">TATA Building India · Telangana Region · 1,299 Schools</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-sm" onclick="showNotification('info','Sync Complete','All 1,299 school records synced with Supabase.')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        Sync Data
+      </button>
+      <button class="btn btn-sm btn-warn" onclick="showView('warnings',document.querySelector('.nav-item:nth-child(3)'))">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+        5 Warnings
+      </button>
+      <button class="btn btn-sm btn-primary" onclick="openModal('add-event-modal')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        Log Event
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════════════════ DASHBOARD ═══════════════════════ -->
+    <div class="view active" id="view-dashboard">
+
+      <!-- Prediction Band -->
+      <div class="predict-band">
+        <div class="predict-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2.05V4.05C17.39 4.59 20.5 8.58 19.96 12.97C19.5 16.61 16.64 19.5 13 19.93V21.93C18.5 21.38 22.5 16.5 21.95 11C21.5 6.25 17.73 2.5 13 2.05M11 2.06C9.05 2.25 7.19 3 5.67 4.26L7.1 5.74C8.22 4.84 9.57 4.26 11 4.06V2.06M4.26 5.67C3 7.19 2.25 9.04 2.05 11H4.05C4.24 9.58 4.8 8.23 5.69 7.1L4.26 5.67M2.06 13C2.26 14.96 3.03 16.81 4.27 18.33L5.69 16.9C4.81 15.77 4.24 14.42 4.06 13H2.06M7.1 18.37L5.67 19.74C7.18 21 9.04 21.79 11 22V20C9.58 19.82 8.23 19.25 7.1 18.37M12 7L8 11H11V17H13V11H16L12 7Z"/></svg>
+        </div>
+        <div class="predict-text">
+          <h3>AI Prediction Engine — Active</h3>
+          <p>Based on current pace, Telangana is projected to reach <strong>Top 3 National Ranking</strong> by Day 45. 3 districts need acceleration.</p>
+        </div>
+        <div class="predict-actions">
+          <button class="btn btn-sm btn-primary" onclick="showView('analytics',null)">View Analytics ↗</button>
+          <button class="btn btn-sm" onclick="showNotification('warn','Action Required','Nizamabad, Adilabad & Karimnagar districts lagging by 18%. Escalate now.')">Escalate Districts</button>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-top info"></div>
+          <div class="metric-label">Total Schools</div>
+          <div class="metric-num">1,299</div>
+          <div class="metric-sub">Telangana Region</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-top ok"></div>
+          <div class="metric-label">Events Complete</div>
+          <div class="metric-num">847</div>
+          <div class="metric-sub"><span class="metric-delta up">↑ 65.2%</span> coverage</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-top warn"></div>
+          <div class="metric-label">ECF Pending</div>
+          <div class="metric-num">124</div>
+          <div class="metric-sub"><span class="metric-delta down">↑ 12 today</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-top danger"></div>
+          <div class="metric-label">Escalated</div>
+          <div class="metric-num">23</div>
+          <div class="metric-sub">Day 5+ overdue</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-top ok"></div>
+          <div class="metric-label">National Rank</div>
+          <div class="metric-num">#4</div>
+          <div class="metric-sub"><span class="metric-delta up">↑ 3 spots</span> this week</div>
+        </div>
+      </div>
+
+      <!-- Two Column -->
+      <div class="two-col">
+        <!-- Active Warnings Card -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">⚠ Active Warnings</div>
+              <div class="card-subtitle">Requires immediate action — sorted by severity</div>
+            </div>
+            <button class="btn btn-sm" onclick="showView('warnings',null)">View All</button>
+          </div>
+          <div class="warning-list">
+            <div class="w-item danger">
+              <div class="w-dot"></div>
+              <div class="w-body">
+                <div class="w-school">Zilla Parishad HS Nizamabad · Day 7</div>
+                <div class="w-msg">ECF not uploaded — 7 days post-event. Critical escalation required.</div>
+                <div class="w-actions">
+                  <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Escalated','ZP HS Nizamabad escalated to District Coordinator.')">Escalate Now</button>
+                  <button class="btn btn-xs" onclick="showNotification('info','Reminder Sent','WhatsApp reminder sent to school coordinator.')">Send Reminder</button>
+                </div>
+              </div>
+            </div>
+            <div class="w-item danger">
+              <div class="w-dot"></div>
+              <div class="w-body">
+                <div class="w-school">MJPS Adilabad · Day 6</div>
+                <div class="w-msg">ECF pending + GCF not initiated. Double compliance gap.</div>
+                <div class="w-actions">
+                  <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Escalated','MJPS Adilabad raised to District level.')">Escalate Now</button>
+                  <button class="btn btn-xs" onclick="markResolved(this)">Mark Resolved</button>
+                </div>
+              </div>
+            </div>
+            <div class="w-item warn">
+              <div class="w-dot"></div>
+              <div class="w-body">
+                <div class="w-school">ZPHS Karimnagar · Day 3</div>
+                <div class="w-msg">ECF upload reminder — Day 3 post-event. Action needed before escalation.</div>
+                <div class="w-actions">
+                  <button class="btn btn-xs btn-warn" onclick="showNotification('warn','Reminder Sent','Reminder dispatched to ZPHS Karimnagar.')">Send Reminder</button>
+                  <button class="btn btn-xs" onclick="markResolved(this)">Mark Resolved</button>
+                </div>
+              </div>
+            </div>
+            <div class="w-item warn">
+              <div class="w-dot"></div>
+              <div class="w-body">
+                <div class="w-school">GHS Warangal · Day 2</div>
+                <div class="w-msg">ECF not yet uploaded — Day 2 warning. First notification triggered.</div>
+                <div class="w-actions">
+                  <button class="btn btn-xs" onclick="showNotification('info','Notified','Day 2 auto-notification sent to GHS Warangal.')">Auto-Notify</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- District Progress -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">District Progress</div>
+              <div class="card-subtitle">Event completion by district</div>
+            </div>
+            <button class="btn btn-sm" onclick="showView('analytics',null)">Full Analytics</button>
+          </div>
+          <div class="analytics-row">
+            <div class="analytic-item">
+              <div class="analytic-label">Hyderabad</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar ok" style="width:92%"></div></div>
+              <div class="analytic-val">92%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Rangareddy</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar ok" style="width:88%"></div></div>
+              <div class="analytic-val">88%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Medchal</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar" style="width:76%"></div></div>
+              <div class="analytic-val">76%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Nalgonda</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar" style="width:71%"></div></div>
+              <div class="analytic-val">71%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Warangal</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar warn" style="width:58%"></div></div>
+              <div class="analytic-val">58%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Karimnagar</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar warn" style="width:49%"></div></div>
+              <div class="analytic-val">49%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Nizamabad</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar danger" style="width:34%"></div></div>
+              <div class="analytic-val">34%</div>
+            </div>
+            <div class="analytic-item">
+              <div class="analytic-label">Adilabad</div>
+              <div class="analytic-bar-wrap"><div class="analytic-bar danger" style="width:28%"></div></div>
+              <div class="analytic-val">28%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Registration Momentum</div>
+            <span class="pill ok"><span class="pill-dot"></span>On Track</span>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px">
+              <span>Overall Target Progress</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy)">847 / 1,299</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px">
+              <span>ECF Compliance Rate</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy)">723 / 847</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill ok" style="width:85%"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px">
+              <span>GCF / WSF Combined</span><span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--navy)">601 / 847</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill warn" style="width:71%"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Quick Actions</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn" style="justify-content:flex-start;width:100%" onclick="openModal('add-event-modal')">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              Log New Event
+            </button>
+            <button class="btn" style="justify-content:flex-start;width:100%" onclick="openModal('ecf-upload-modal')">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+              Upload ECF Document
+            </button>
+            <button class="btn" style="justify-content:flex-start;width:100%" onclick="showNotification('info','Bulk Reminder','Reminder sent to all 124 schools with pending ECF.')">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              Bulk Reminder — ECF Pending
+            </button>
+            <button class="btn" style="justify-content:flex-start;width:100%" onclick="showNotification('ok','Report Generated','District performance report exported to PDF.')">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Export District Report
+            </button>
+            <button class="btn btn-primary" style="justify-content:flex-start;width:100%" onclick="showView('warnings',null)">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 2L1 21h22L12 2zm0 3.5L20.5 19h-17L12 5.5zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+              Review All Warnings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ WARNING ENGINE ══════════════════ -->
+    <div class="view" id="view-warnings">
+      <div class="tabs">
+        <button class="tab active" onclick="filterWarnings('all',this)">All (5)</button>
+        <button class="tab" onclick="filterWarnings('danger',this)">Escalated (2)</button>
+        <button class="tab" onclick="filterWarnings('warn',this)">Warning (2)</button>
+        <button class="tab" onclick="filterWarnings('info',this)">Monitoring (1)</button>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-hd">
+          <div>
+            <div class="card-title">Business Rules Engine</div>
+            <div class="card-subtitle">ECF: Day 2 = Warning | Day 5 = Escalation | GCF/WSF: 48hr post-event trigger</div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="showNotification('ok','Rules Updated','Business rules saved and applied to all 1,299 schools.')">Save Rules</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:8px;padding:12px">
+            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Day 2 Trigger</div>
+            <div style="font-size:12px;color:var(--text)">Auto-send WhatsApp + email reminder. Log in activity feed.</div>
+          </div>
+          <div style="background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:8px;padding:12px">
+            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Day 5 Escalation</div>
+            <div style="font-size:12px;color:var(--text)">Notify District Coordinator. Flag in national dashboard. Freeze further events.</div>
+          </div>
+          <div style="background:var(--info-bg);border:1px solid var(--info-border);border-radius:8px;padding:12px">
+            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--info);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">GCF / WSF Rule</div>
+            <div style="font-size:12px;color:var(--text)">Must be initiated within 48hrs of event. Warning auto-triggers at Hour 36.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">Active Warnings — All Schools</div>
+          <button class="btn btn-sm btn-primary" onclick="showNotification('ok','Bulk Action Complete','Reminders sent to all warning-level schools.')">Bulk Remind All</button>
+        </div>
+        <div class="warning-list" id="warnings-list">
+          <div class="w-item danger" data-level="danger">
+            <div class="w-dot"></div>
+            <div class="w-body">
+              <div class="w-school">Zilla Parishad HS Nizamabad · ECF · Day 7</div>
+              <div class="w-msg">Critical: ECF not uploaded 7 days after event. National ranking impact imminent.</div>
+              <div class="w-actions">
+                <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Escalated to District','ZP HS Nizamabad case raised to District Coordinator Nizamabad.')">Escalate to District</button>
+                <button class="btn btn-xs btn-warn" onclick="showNotification('warn','Reminder Sent','WhatsApp + Email sent to ZP HS Nizamabad.')">Send Reminder</button>
+                <button class="btn btn-xs" onclick="markResolved(this)">Mark Resolved</button>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0"><span class="pill danger"><span class="pill-dot"></span>Day 7</span></div>
+          </div>
+          <div class="w-item danger" data-level="danger">
+            <div class="w-dot"></div>
+            <div class="w-body">
+              <div class="w-school">MJPS Adilabad · ECF + GCF · Day 6</div>
+              <div class="w-msg">Double compliance failure: ECF overdue Day 6, GCF never initiated. Immediate intervention needed.</div>
+              <div class="w-actions">
+                <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Escalated','MJPS Adilabad dual-escalation sent to District + State.')">Escalate to State</button>
+                <button class="btn btn-xs" onclick="markResolved(this)">Mark Resolved</button>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0"><span class="pill danger"><span class="pill-dot"></span>Day 6</span></div>
+          </div>
+          <div class="w-item warn" data-level="warn">
+            <div class="w-dot"></div>
+            <div class="w-body">
+              <div class="w-school">ZPHS Karimnagar · ECF · Day 3</div>
+              <div class="w-msg">ECF reminder — Day 3 post-event. 2 days until escalation threshold.</div>
+              <div class="w-actions">
+                <button class="btn btn-xs btn-warn" onclick="showNotification('warn','Reminder Sent','Day 3 reminder sent to ZPHS Karimnagar.')">Send Reminder</button>
+                <button class="btn btn-xs btn-ok" onclick="openModal('ecf-upload-modal')">Upload ECF</button>
+                <button class="btn btn-xs" onclick="markResolved(this)">Mark Resolved</button>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0"><span class="pill warn"><span class="pill-dot"></span>Day 3</span></div>
+          </div>
+          <div class="w-item warn" data-level="warn">
+            <div class="w-dot"></div>
+            <div class="w-body">
+              <div class="w-school">GHS Warangal Urban · ECF · Day 2</div>
+              <div class="w-msg">First warning trigger. ECF not uploaded at Day 2. Auto-notification sent.</div>
+              <div class="w-actions">
+                <button class="btn btn-xs" onclick="showNotification('info','Notified','Auto Day-2 notification confirmed for GHS Warangal.')">Confirm Notification</button>
+                <button class="btn btn-xs btn-ok" onclick="openModal('ecf-upload-modal')">Upload ECF</button>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0"><span class="pill warn"><span class="pill-dot"></span>Day 2</span></div>
+          </div>
+          <div class="w-item info" data-level="info">
+            <div class="w-dot"></div>
+            <div class="w-body">
+              <div class="w-school">Model School Medak · WSF · Hour 30</div>
+              <div class="w-msg">WSF not initiated 30hrs post-event. Monitoring — 6hrs before Day 2 warning triggers.</div>
+              <div class="w-actions">
+                <button class="btn btn-xs" onclick="showNotification('info','Monitoring','Model School Medak WSF being tracked. Alert set for Hour 36.')">Set Alert</button>
+                <button class="btn btn-xs btn-ok" onclick="markResolved(this)">Mark Initiated</button>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0"><span class="pill info"><span class="pill-dot"></span>Hr 30</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ SCHOOLS ═════════════════════════ -->
+    <div class="view" id="view-schools">
+      <div class="filter-bar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--muted)"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Search schools, districts..." oninput="filterTable(this.value)"/>
+        </div>
+        <select class="form-select" style="width:auto" onchange="filterByStatus(this.value)">
+          <option value="">All Statuses</option>
+          <option value="complete">Complete</option>
+          <option value="warning">Warning</option>
+          <option value="escalated">Escalated</option>
+          <option value="pending">Pending</option>
+        </select>
+        <button class="btn btn-sm btn-primary" onclick="openModal('add-event-modal')">+ Add School Event</button>
+        <button class="btn btn-sm" onclick="showNotification('ok','Exported','School list exported to CSV.')">Export CSV</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table id="schools-table">
+            <thead>
+              <tr>
+                <th>School Name</th>
+                <th>District</th>
+                <th>Event Status</th>
+                <th>ECF Status</th>
+                <th>GCF</th>
+                <th>WSF</th>
+                <th>Days Since Event</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="schools-body">
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:12px 0 0;font-size:11px;color:var(--muted);text-align:right">Showing 15 of 1,299 schools · <a href="#" style="color:var(--coral)" onclick="showNotification('info','Full List','Connect to Supabase to load all 1,299 records.')">Load all from Supabase</a></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ EVENTS ══════════════════════════ -->
+    <div class="view" id="view-events">
+      <div class="filter-bar">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--muted)"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" placeholder="Search events..."/>
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="openModal('add-event-modal')">+ Log Event</button>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Event Log — Recent 10</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>School</th><th>District</th><th>Event Date</th><th>Type</th><th>Participants</th><th>ECF</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ZP HS Bodhan</strong></td><td>Nizamabad</td><td>15 Mar 2026</td><td>Essay Orientation</td><td>142</td><td><span class="pill ok"><span class="pill-dot"></span>Uploaded</span></td><td><span class="pill ok"><span class="pill-dot"></span>Complete</span></td><td><button class="btn btn-xs" onclick="showNotification('info','Record Viewed','ZP HS Bodhan event details loaded.')">View</button></td></tr>
+              <tr><td><strong>MJPS Nirmal</strong></td><td>Nirmal</td><td>14 Mar 2026</td><td>School Visit</td><td>89</td><td><span class="pill ok"><span class="pill-dot"></span>Uploaded</span></td><td><span class="pill ok"><span class="pill-dot"></span>Complete</span></td><td><button class="btn btn-xs" onclick="showNotification('info','Record Viewed','MJPS Nirmal details loaded.')">View</button></td></tr>
+              <tr><td><strong>GHS Karimnagar</strong></td><td>Karimnagar</td><td>18 Mar 2026</td><td>Essay Orientation</td><td>201</td><td><span class="pill warn"><span class="pill-dot"></span>Pending</span></td><td><span class="pill warn"><span class="pill-dot"></span>ECF Warning</span></td><td><button class="btn btn-xs btn-warn" onclick="openModal('ecf-upload-modal')">Upload ECF</button></td></tr>
+              <tr><td><strong>ZPHS Medak</strong></td><td>Medak</td><td>16 Mar 2026</td><td>Workshop</td><td>175</td><td><span class="pill ok"><span class="pill-dot"></span>Uploaded</span></td><td><span class="pill ok"><span class="pill-dot"></span>Complete</span></td><td><button class="btn btn-xs" onclick="showNotification('info','Loaded','ZPHS Medak loaded.')">View</button></td></tr>
+              <tr><td><strong>Model School Adilabad</strong></td><td>Adilabad</td><td>15 Mar 2026</td><td>School Visit</td><td>133</td><td><span class="pill danger"><span class="pill-dot"></span>Overdue</span></td><td><span class="pill danger"><span class="pill-dot"></span>Escalated</span></td><td><button class="btn btn-xs btn-danger" onclick="showNotification('danger','Escalated','Model School Adilabad escalated.')">Escalate</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ ECF STATUS ══════════════════════ -->
+    <div class="view" id="view-ecf">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+        <div class="metric-card"><div class="metric-top ok"></div><div class="metric-label">ECF Uploaded</div><div class="metric-num">723</div><div class="metric-sub">85.4% compliance</div></div>
+        <div class="metric-card"><div class="metric-top warn"></div><div class="metric-label">Day 2 Warning</div><div class="metric-num">52</div><div class="metric-sub">Reminder sent</div></div>
+        <div class="metric-card"><div class="metric-top danger"></div><div class="metric-label">Day 5 Escalated</div><div class="metric-num">23</div><div class="metric-sub">District notified</div></div>
+        <div class="metric-card"><div class="metric-top info"></div><div class="metric-label">Pending Review</div><div class="metric-num">49</div><div class="metric-sub">Awaiting upload</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">ECF Compliance Tracker</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="showNotification('ok','Reminders Sent','Day-2 reminders dispatched to all 52 pending schools.')">Bulk Remind Day-2</button>
+            <button class="btn btn-sm btn-danger" onclick="showNotification('danger','Escalated','23 Day-5 schools escalated to District Coordinators.')">Escalate Day-5 Batch</button>
+            <button class="btn btn-sm btn-primary" onclick="openModal('ecf-upload-modal')">Upload ECF</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>School</th><th>District</th><th>Event Date</th><th>Day Count</th><th>ECF Status</th><th>Action Taken</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><strong>ZP HS Nizamabad</strong></td><td>Nizamabad</td><td>14 Mar</td><td><span class="text-danger" style="font-weight:700">Day 7</span></td><td><span class="pill danger"><span class="pill-dot"></span>Escalated</span></td><td>District notified</td><td><button class="btn btn-xs btn-danger" onclick="showNotification('danger','Re-escalated','Sent to State level.')">Re-Escalate</button></td></tr>
+              <tr><td><strong>MJPS Adilabad</strong></td><td>Adilabad</td><td>15 Mar</td><td><span class="text-danger" style="font-weight:700">Day 6</span></td><td><span class="pill danger"><span class="pill-dot"></span>Escalated</span></td><td>District + State</td><td><button class="btn btn-xs" onclick="openModal('ecf-upload-modal')">Upload ECF</button></td></tr>
+              <tr><td><strong>ZPHS Karimnagar</strong></td><td>Karimnagar</td><td>18 Mar</td><td><span class="text-warn" style="font-weight:700">Day 3</span></td><td><span class="pill warn"><span class="pill-dot"></span>Warning</span></td><td>Reminder sent</td><td><button class="btn btn-xs btn-warn" onclick="showNotification('warn','Reminder Sent','Day 3 reminder sent.')">Re-Remind</button></td></tr>
+              <tr><td><strong>GHS Warangal</strong></td><td>Warangal</td><td>19 Mar</td><td><span class="text-warn" style="font-weight:700">Day 2</span></td><td><span class="pill warn"><span class="pill-dot"></span>Warning</span></td><td>Auto-notified</td><td><button class="btn btn-xs btn-ok" onclick="openModal('ecf-upload-modal')">Upload ECF</button></td></tr>
+              <tr><td><strong>ZPHS Medak Central</strong></td><td>Medak</td><td>20 Mar</td><td>Day 1</td><td><span class="pill info"><span class="pill-dot"></span>Monitoring</span></td><td>—</td><td><button class="btn btn-xs" onclick="showNotification('info','Noted','ZPHS Medak Central under monitoring.')">Monitor</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ GCF / WSF ═══════════════════════ -->
+    <div class="view" id="view-gcf">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">GCF Status — Group Completion Form</div><div class="card-subtitle">48hr post-event initiation rule</div></div>
+            <button class="btn btn-sm btn-primary" onclick="showNotification('ok','GCF Batch Sent','GCF reminders dispatched.')">Bulk Remind</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--ok-bg);border-radius:8px;border:1px solid var(--ok-border)">
+              <span style="font-size:12px">GCF Submitted</span><span class="pill ok"><span class="pill-dot"></span>601 schools</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--warn-bg);border-radius:8px;border:1px solid var(--warn-border)">
+              <span style="font-size:12px">GCF In Progress</span><span class="pill warn"><span class="pill-dot"></span>142 schools</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--danger-bg);border-radius:8px;border:1px solid var(--danger-border)">
+              <span style="font-size:12px">GCF Not Initiated</span><span class="pill danger"><span class="pill-dot"></span>104 schools</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-warn" onclick="showNotification('warn','GCF Reminders','Reminders sent to 142 in-progress schools.')">Remind In-Progress</button>
+            <button class="btn btn-sm btn-danger" onclick="showNotification('danger','GCF Escalated','104 non-initiated GCFs escalated to districts.')">Escalate Not-Initiated</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">WSF Status — Winner Submission Form</div><div class="card-subtitle">48hr post-event initiation rule</div></div>
+            <button class="btn btn-sm btn-primary" onclick="showNotification('ok','WSF Batch Sent','WSF reminders dispatched.')">Bulk Remind</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--ok-bg);border-radius:8px;border:1px solid var(--ok-border)">
+              <span style="font-size:12px">WSF Submitted</span><span class="pill ok"><span class="pill-dot"></span>588 schools</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--warn-bg);border-radius:8px;border:1px solid var(--warn-border)">
+              <span style="font-size:12px">WSF In Progress</span><span class="pill warn"><span class="pill-dot"></span>156 schools</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--danger-bg);border-radius:8px;border:1px solid var(--danger-border)">
+              <span style="font-size:12px">WSF Not Initiated</span><span class="pill danger"><span class="pill-dot"></span>103 schools</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-sm btn-warn" onclick="showNotification('warn','WSF Reminders','Reminders sent to 156 in-progress schools.')">Remind In-Progress</button>
+            <button class="btn btn-sm btn-danger" onclick="showNotification('danger','WSF Escalated','103 non-initiated WSFs escalated to districts.')">Escalate Not-Initiated</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ ANALYTICS ══════════════════════ -->
+    <div class="view" id="view-analytics">
+      <div class="predict-band">
+        <div class="predict-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        </div>
+        <div class="predict-text">
+          <h3>McKinsey 7S + Harvard Balanced Scorecard Framework Applied</h3>
+          <p>Predictive model draws on IIM Operations, XLRI HR Analytics, and TATA Sons execution frameworks to project state-level outcomes.</p>
+        </div>
+        <div class="predict-actions">
+          <button class="btn btn-sm" onclick="showNotification('ok','Report Generated','Full analytics report exported using Harvard BSC framework.')">Export Report</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Velocity Forecast — National Rank Trajectory</div></div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">Based on current 7-day momentum (avg. 47 events/day), Telangana is projected to reach <strong style="color:var(--navy)">Top 3 National Ranking</strong> by Day 45 of the campaign.</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Day 7 (Today)</span><span style="font-family:'Syne',sans-serif;font-weight:700">#4 National</span></div>
+              <div class="progress-bar"><div class="progress-fill ok" style="width:65%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Projected Day 21</span><span style="font-family:'Syne',sans-serif;font-weight:700">#3 National</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Projected Day 45</span><span style="font-family:'Syne',sans-serif;font-weight:700">#2 National</span></div>
+              <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--info-bg);border-radius:8px;border:1px solid var(--info-border);font-size:12px;color:var(--info)">
+            <strong>Google OKR Signal:</strong> Nizamabad, Adilabad & Karimnagar districts must each add 15+ events/week to sustain trajectory. Recommended intervention: deploy field coordinators.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Risk Heatmap — Amazon PRFAQ Model</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:var(--danger-bg);border:1px solid var(--danger-border)">
+              <div style="width:10px;height:10px;border-radius:50%;background:#E24B4A;flex-shrink:0"></div>
+              <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700">HIGH RISK — Adilabad</div><div style="font-size:11px;color:var(--muted)">28% completion. ECF backlog growing. Immediate intervention.</div></div>
+              <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Adilabad Risk Alert','Adilabad District Coordinator notified. Field visit scheduled.')">Intervene</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:var(--danger-bg);border:1px solid var(--danger-border)">
+              <div style="width:10px;height:10px;border-radius:50%;background:#E24B4A;flex-shrink:0"></div>
+              <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700">HIGH RISK — Nizamabad</div><div style="font-size:11px;color:var(--muted)">34% completion. 7 escalated schools. National ranking at risk.</div></div>
+              <button class="btn btn-xs btn-danger" onclick="showNotification('danger','Nizamabad Alert','Escalation raised.')">Intervene</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:var(--warn-bg);border:1px solid var(--warn-border)">
+              <div style="width:10px;height:10px;border-radius:50%;background:#F5C842;flex-shrink:0"></div>
+              <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700">MEDIUM — Karimnagar</div><div style="font-size:11px;color:var(--muted)">49% completion. Acceleration plan needed in next 7 days.</div></div>
+              <button class="btn btn-xs btn-warn" onclick="showNotification('warn','Karimnagar Plan','Acceleration plan sent to Karimnagar coordinator.')">Action Plan</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:var(--ok-bg);border:1px solid var(--ok-border)">
+              <div style="width:10px;height:10px;border-radius:50%;background:#639922;flex-shrink:0"></div>
+              <div style="flex:1"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700">ON TRACK — Hyderabad</div><div style="font-size:11px;color:var(--muted)">92% completion. Model district. Benchmark shared nationally.</div></div>
+              <button class="btn btn-xs btn-ok" onclick="showNotification('ok','Best Practice Shared','Hyderabad playbook shared with all districts.')">Share Playbook</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════ CERTIFICATIONS ════════════════ -->
+    <div class="view" id="view-certs">
+      <div class="predict-band" style="margin-bottom:20px">
+        <div class="predict-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/></svg>
+        </div>
+        <div class="predict-text">
+          <h3>AI Fluency Certification Track — Portfolio Milestone</h3>
+          <p>Both certifications directly strengthen the MAANG Strategy & Operations transition. Complete these alongside SEVA to demonstrate full Agentic AI capability.</p>
+        </div>
+      </div>
+      <div class="cert-grid">
+        <div class="cert-card">
+          <div class="cert-provider">Anthropic</div>
+          <div class="cert-name">AI Fluency Certification</div>
+          <div class="cert-desc">Covers Claude API, prompt engineering, responsible AI deployment, and agentic workflows. Directly validates the AI strategy in your MAANG portfolio.</div>
+          <div class="cert-progress-label"><span>Progress</span><span style="font-family:'Syne',sans-serif;font-weight:700">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill danger" style="width:0%" id="anthropic-bar"></div></div>
+          <div class="cert-actions">
+            <button class="btn btn-primary btn-sm" onclick="openLink('https://www.anthropic.com')">Start Now ↗</button>
+            <button class="btn btn-sm" onclick="updateProgress('anthropic-bar',25,'Anthropic')">Mark 25%</button>
+            <button class="btn btn-sm" onclick="updateProgress('anthropic-bar',50,'Anthropic')">Mark 50%</button>
+            <button class="btn btn-sm btn-ok" onclick="updateProgress('anthropic-bar',100,'Anthropic')">Complete ✓</button>
+          </div>
+        </div>
+        <div class="cert-card">
+          <div class="cert-provider">DeepLearning.AI</div>
+          <div class="cert-name">Agent Skills Certification</div>
+          <div class="cert-desc">Multi-agent orchestration, tool use, RAG pipelines, and LLM system design. Perfect complement to SEVA's agentic architecture demonstration.</div>
+          <div class="cert-progress-label"><span>Progress</span><span style="font-family:'Syne',sans-serif;font-weight:700">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill danger" style="width:0%" id="dlai-bar"></div></div>
+          <div class="cert-actions">
+            <button class="btn btn-primary btn-sm" onclick="openLink('https://www.deeplearning.ai')">Start Now ↗</button>
+            <button class="btn btn-sm" onclick="updateProgress('dlai-bar',25,'DeepLearning.AI')">Mark 25%</button>
+            <button class="btn btn-sm" onclick="updateProgress('dlai-bar',50,'DeepLearning.AI')">Mark 50%</button>
+            <button class="btn btn-sm btn-ok" onclick="updateProgress('dlai-bar',100,'DeepLearning.AI')">Complete ✓</button>
+          </div>
+        </div>
+        <div class="cert-card" style="grid-column:1/-1;background:var(--navy);border-color:var(--navy-light)">
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--coral);margin-bottom:8px">Portfolio Strategy Note</div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">SEVA + Certifications = Differentiated MAANG Profile</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:16px">SEVA demonstrates live Agentic AI deployment at scale (1,299 schools, real Supabase data, frameworks from McKinsey / Google / Amazon / XLRI / IIM / TATA Sons). Combined with Anthropic + DeepLearning.AI credentials, this is a rare portfolio for Strategy & Operations Leadership roles.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="showNotification('ok','Portfolio Note','SEVA portfolio framing saved. Ready for MAANG interview prep.')">Save Portfolio Note</button>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff" onclick="showNotification('info','Resume Tip','Add SEVA under Projects with: React + Vite + Supabase + Agentic AI Analytics for 1,299 Telangana schools.')">Resume Framing Tips</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ MODALS ═══ -->
+<div class="modal-overlay" id="add-event-modal" onclick="closeModalOutside(event,'add-event-modal')">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">Log New Event</div>
+      <button class="modal-close" onclick="closeModal('add-event-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">School Name</label><input class="form-input" placeholder="e.g. ZP HS Bodhan"/></div>
+        <div class="form-row"><label class="form-label">District</label><select class="form-select"><option>Select District</option><option>Hyderabad</option><option>Rangareddy</option><option>Medchal</option><option>Nizamabad</option><option>Karimnagar</option><option>Warangal</option><option>Adilabad</option><option>Medak</option><option>Nalgonda</option></select></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Event Date</label><input class="form-input" type="date"/></div>
+        <div class="form-row"><label class="form-label">Event Type</label><select class="form-select"><option>Essay Orientation</option><option>School Visit</option><option>Workshop</option><option>Prize Distribution</option></select></div>
+      </div>
+      <div class="form-row"><label class="form-label">No. of Participants</label><input class="form-input" type="number" placeholder="e.g. 150"/></div>
+      <div class="form-row"><label class="form-label">Coordinator Name</label><input class="form-input" placeholder="Event coordinator's name"/></div>
+      <div class="form-row"><label class="form-label">Notes</label><textarea class="form-input" rows="3" style="resize:vertical" placeholder="Any additional context..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('add-event-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Save Event →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ecf-upload-modal" onclick="closeModalOutside(event,'ecf-upload-modal')">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">Upload ECF Document</div>
+      <button class="modal-close" onclick="closeModal('ecf-upload-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">School</label><input class="form-input" placeholder="School name or DISE code"/></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Event Date</label><input class="form-input" type="date"/></div>
+        <div class="form-row"><label class="form-label">District</label><select class="form-select"><option>Select District</option><option>Hyderabad</option><option>Nizamabad</option><option>Karimnagar</option><option>Warangal</option><option>Adilabad</option></select></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">ECF Document</label>
+        <div style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;background:var(--bg)" onclick="showNotification('info','Upload','File browser opened. Connect Supabase storage to enable real uploads.')">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:4px">Click to upload ECF</div>
+          <div style="font-size:12px;color:var(--muted)">PDF or image · Max 10MB · Saves to Supabase storage</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('ecf-upload-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="uploadECF()">Upload & Mark Complete →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const schoolsData=[
+  {name:"ZP HS Bodhan",dist:"Nizamabad",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:8},
+  {name:"MJPS Nirmal",dist:"Nirmal",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:9},
+  {name:"GHS Karimnagar Central",dist:"Karimnagar",event:"Complete",ecf:"Pending",gcf:"In Progress",wsf:"Pending",days:3},
+  {name:"ZPHS Medak",dist:"Medak",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:7},
+  {name:"Model School Adilabad",dist:"Adilabad",event:"Complete",ecf:"Overdue",gcf:"Not Initiated",wsf:"Not Initiated",days:6},
+  {name:"GHS Warangal Urban",dist:"Warangal",event:"Complete",ecf:"Pending",gcf:"Submitted",wsf:"In Progress",days:2},
+  {name:"ZPHS Rangareddy",dist:"Rangareddy",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:11},
+  {name:"Govt Boys HS Hyderabad",dist:"Hyderabad",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:14},
+  {name:"ZP HS Nizamabad Central",dist:"Nizamabad",event:"Complete",ecf:"Overdue",gcf:"Not Initiated",wsf:"Not Initiated",days:7},
+  {name:"MJPS Mancherial",dist:"Mancherial",event:"Pending",ecf:"—",gcf:"—",wsf:"—",days:0},
+  {name:"GHS Sangareddy",dist:"Sangareddy",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:5},
+  {name:"ZPHS Nalgonda",dist:"Nalgonda",event:"Complete",ecf:"Uploaded",gcf:"In Progress",wsf:"Pending",days:4},
+  {name:"Model School Medak",dist:"Medak",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Pending",days:1},
+  {name:"GHS Mahabubnagar",dist:"Mahabubnagar",event:"Complete",ecf:"Uploaded",gcf:"Submitted",wsf:"Submitted",days:10},
+  {name:"ZPHS Khammam",dist:"Khammam",event:"Pending",ecf:"—",gcf:"—",wsf:"—",days:0},
+];
+
+function getPillClass(val){
+  if(val==="Uploaded"||val==="Submitted"||val==="Complete")return"ok";
+  if(val==="Pending"||val==="In Progress")return"warn";
+  if(val==="Overdue"||val==="Not Initiated"||val==="Escalated")return"danger";
+  if(val==="—")return"gray";
+  return"gray";
+}
+
+function renderSchools(data){
+  const tb=document.getElementById("schools-body");
+  tb.innerHTML=data.map(s=>{
+    const daysCell=s.days===0?"—":s.days>=5?`<span style="color:var(--danger);font-weight:700">${s.days}</span>`:s.days>=2?`<span style="color:var(--warn);font-weight:700">${s.days}</span>`:s.days;
+    return `<tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${s.dist}</td>
+      <td><span class="pill ${getPillClass(s.event)}"><span class="pill-dot"></span>${s.event}</span></td>
+      <td><span class="pill ${getPillClass(s.ecf)}"><span class="pill-dot"></span>${s.ecf}</span></td>
+      <td><span class="pill ${getPillClass(s.gcf)}"><span class="pill-dot"></span>${s.gcf}</span></td>
+      <td><span class="pill ${getPillClass(s.wsf)}"><span class="pill-dot"></span>${s.wsf}</span></td>
+      <td>${daysCell}</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-xs" onclick="showNotification('info','School Loaded','${s.name} record opened.')">View</button>
+        ${s.ecf==="Pending"||s.ecf==="Overdue"?`<button class="btn btn-xs btn-warn" onclick="openModal('ecf-upload-modal')">ECF</button>`:""}
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+function filterTable(q){
+  const filtered=schoolsData.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.dist.toLowerCase().includes(q.toLowerCase()));
+  renderSchools(filtered);
+}
+
+function filterByStatus(v){
+  if(!v){renderSchools(schoolsData);return;}
+  const map={complete:"Complete",warning:"Pending",escalated:"Overdue",pending:"Pending"};
+  const filtered=schoolsData.filter(s=>s.ecf===map[v]||s.event===map[v]||(v==="escalated"&&(s.ecf==="Overdue"||s.gcf==="Not Initiated")));
+  renderSchools(filtered);
+}
+
+renderSchools(schoolsData);
+
+const pageTitles={
+  dashboard:{t:"Dashboard",s:"TATA Building India · Telangana Region · 1,299 Schools"},
+  warnings:{t:"Warning Engine",s:"ECF Day 2 Warning · Day 5 Escalation · GCF/WSF 48hr Rule"},
+  schools:{t:"Schools",s:"All 1,299 Telangana schools · Search · Filter · Export"},
+  events:{t:"Events",s:"Event log · Compliance tracking"},
+  ecf:{t:"ECF Status",s:"Event Completion Form · Day 2 Warning · Day 5 Escalation"},
+  gcf:{t:"GCF / WSF Status",s:"Group Completion Form · Winner Submission Form · 48hr Rule"},
+  analytics:{t:"Predictive Analytics",s:"McKinsey 7S · Harvard BSC · Google OKR · Amazon PRFAQ"},
+  certs:{t:"Certifications",s:"Anthropic AI Fluency · DeepLearning.AI Agent Skills"}
+};
+
+function showView(id,btn){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  const el=document.getElementById("view-"+id);
+  if(el)el.classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  if(btn&&btn.classList)btn.classList.add("active");
+  const p=pageTitles[id];
+  if(p){document.getElementById("page-title").textContent=p.t;document.getElementById("page-sub").textContent=p.s;}
+}
+
+function filterWarnings(level,btn){
+  document.querySelectorAll(".tabs .tab").forEach(t=>t.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  document.querySelectorAll("#warnings-list .w-item").forEach(item=>{
+    item.style.display=(level==="all"||item.dataset.level===level)?"flex":"none";
+  });
+}
+
+function showNotification(type,title,msg){
+  const icons={ok:"✓",info:"ℹ",warn:"⚠",danger:"✕"};
+  const classes={ok:"ok-toast",info:"",warn:"warn-toast",danger:""};
+  const container=document.getElementById("toast-container");
+  const toast=document.createElement("div");
+  toast.className=`toast ${classes[type]}`;
+  toast.innerHTML=`<span class="toast-icon">${icons[type]}</span><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+  container.appendChild(toast);
+  setTimeout(()=>{toast.style.animation="slideOut 0.3s ease forwards";setTimeout(()=>toast.remove(),300);},4000);
+}
+
+function markResolved(btn){
+  const item=btn.closest(".w-item");
+  item.className="w-item ok";
+  item.querySelector(".w-dot").style.background="#639922";
+  const school=item.querySelector(".w-school").textContent;
+  item.querySelector(".w-actions").innerHTML=`<span style="font-size:11px;color:var(--ok);font-weight:600">✓ Resolved</span>`;
+  const badge=document.getElementById("warn-count");
+  if(badge){const n=parseInt(badge.textContent)-1;badge.textContent=n;if(n===0)badge.remove();}
+  showNotification("ok","Resolved",school+" marked as resolved.");
+}
+
+function openModal(id){document.getElementById(id).classList.add("open");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+function closeModalOutside(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+
+function saveEvent(){
+  closeModal("add-event-modal");
+  showNotification("ok","Event Logged","New school event saved successfully. ECF timer started.");
+}
+
+function uploadECF(){
+  closeModal("ecf-upload-modal");
+  showNotification("ok","ECF Uploaded","ECF document uploaded and school marked complete.");
+  const badge=document.getElementById("ecf-badge");
+  if(badge){const n=parseInt(badge.textContent)-1;badge.textContent=n;}
+}
+
+function updateProgress(barId,pct,name){
+  const bar=document.getElementById(barId);
+  if(!bar)return;
+  bar.style.width=pct+"%";
+  bar.className="progress-fill"+(pct<30?" danger":pct<70?" warn":" ok");
+  const label=bar.closest(".cert-card").querySelector(".cert-progress-label span:last-child");
+  if(label)label.textContent=pct+"%";
+  showNotification("ok",name+" Updated",name+" certification progress set to "+pct+"%. Keep going!");
+}
+
+function openLink(url){window.open(url,"_blank");}
+
+setTimeout(()=>{showNotification("warn","ECF Warning","GHS Warangal Urban — Day 2 ECF not uploaded. Auto-notification sent.");},1200);
+setTimeout(()=>{showNotification("danger","Escalation Alert","ZP HS Nizamabad — Day 7. District Coordinator notified.");},2800);
+</script>
+</body>
 </html>
